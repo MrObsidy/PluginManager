@@ -45,12 +45,44 @@ public class PluginManager {
 	
 	/**
 	 * Add any classes extending pluginmanager.api.event.Event here, any methods with the @EventHandler annotation will check if the
-	 * parameter of the annotation matches an event either specified by this library or by you.
+	 * parameter of the annotation matches an event either specified by this library or by you. In order for this to take effect during runtime,
+	 * you need to call refreshEvents();
 	 * 
 	 * @param param
 	 */
 	public void injectEvent(Class<? extends Event> param) {
 		this.EVENTS.add(param);
+	}
+	
+	/**
+	 * Resort all the events so that they can be quickly loaded at runtime
+	 * 
+	 */
+	public void refreshEvents() {
+		for(PluginWrapper plugin : this.PLUGINS) {
+			
+			try {
+				ConsoleHandler.println("Checking plugin " + plugin.getMainClass().getAnnotation(Plugin.class).id() + " for EventHandlers");
+			} catch (Exception e) {
+				System.out.println("This should never happen");
+				e.printStackTrace();
+			}
+				
+			for(Class<?> eventReceiver : plugin.getEventHandlers()) {
+				for(Method method : eventReceiver.getMethods()) {
+					if (method.isAnnotationPresent(EventHandler.class)) {
+						ConsoleHandler.println("Checking method " + method.toString());
+						Parameter param = method.getParameters()[0];
+						for(Class<?> event : this.EVENTS) {
+							if(param.getType().isAssignableFrom(event)) {
+								this.EVENTLISTENERS.get(param.getType()).add(method);
+								ConsoleHandler.println("Adding method " + method.toString() + " to EventListener type " + this.EVENTLISTENERS.get(param.getType()).toString() + " which now contains " + this.EVENTLISTENERS.get(param.getType()).size() + " eventHandlers");
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -351,29 +383,7 @@ public class PluginManager {
 		}
 		
 		//iterate through all the plugins, select all methods matching the EventType and add them to their respective EventList
-		for(PluginWrapper plugin : this.PLUGINS) {
-			
-			try {
-				ConsoleHandler.println("Checking plugin " + plugin.getMainClass().getAnnotation(Plugin.class).id() + " for EventHandlers");
-			} catch (Exception e) {
-				exceptions.addException(e);
-			}
-				
-			for(Class<?> eventReceiver : plugin.getEventHandlers()) {
-				for(Method method : eventReceiver.getMethods()) {
-					if (method.isAnnotationPresent(EventHandler.class)) {
-						ConsoleHandler.println("Checking method " + method.toString());
-						Parameter param = method.getParameters()[0];
-						for(Class<?> event : this.EVENTS) {
-							if(param.getType().isAssignableFrom(event)) {
-								this.EVENTLISTENERS.get(param.getType()).add(method);
-								ConsoleHandler.println("Adding method " + method.toString() + " to EventListener type " + this.EVENTLISTENERS.get(param.getType()).toString() + " which now contains " + this.EVENTLISTENERS.get(param.getType()).size() + " eventHandlers");
-							}
-						}
-					}
-				}
-			}
-		}
+		this.refreshEvents();
 		
 		if(exceptions.recordedExceptions().length != 0) throw exceptions;
 		
@@ -408,7 +418,7 @@ public class PluginManager {
 				if(!this.isPluginLoaded(id)) missingDependencies.add(dep);
 			} else {
 				metDependencies = metDependencies & this.isPluginLoadedAtOrAboveVersion(id, lower) & this.isPluginLoadedAtOrBelowVersion(id, upper);
-				if(!(this.isPluginLoadedAtOrBelowVersion(id, upper) | this.isPluginLoadedAtOrAboveVersion(id, lower))) missingDependencies.add(dep);
+				if(!(this.isPluginLoadedAtOrBelowVersion(id, upper) & this.isPluginLoadedAtOrAboveVersion(id, lower))) missingDependencies.add(dep);
 			}
 		}
 		
@@ -420,6 +430,16 @@ public class PluginManager {
 		}
 		
 		ConsoleHandler.println("Done checking dependencies.");
+		ConsoleHandler.println("Registering plugin-injected events...");
+		
+		for(Class<? extends Event> event : inEv.getEvents()) {
+			this.injectEvent(event);
+		}
+		
+		this.refreshEvents();
+		
+		ConsoleHandler.println("Done registering plugin-injected events.");
+		ConsoleHandler.println("Done initialiting.");
 	}
 	
 	/**

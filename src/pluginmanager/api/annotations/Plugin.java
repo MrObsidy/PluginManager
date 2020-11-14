@@ -7,7 +7,8 @@ import java.lang.annotation.Target;
 import java.lang.annotation.Documented;
 
 /**
- * 
+ * Classes annotated with this annotation will be loaded as a plugin. Only one class per jar can be annotated with this annotations, otherwise
+ * PluginManager:initialize() will throw an exception.
  * 
  * @author alexander
  *

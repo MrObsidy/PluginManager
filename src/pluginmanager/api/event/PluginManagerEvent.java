@@ -22,6 +22,7 @@ public abstract class PluginManagerEvent extends Event {
 	public static class InitializationEvent extends PluginManagerEvent {
 		
 		private List<String> dependencies = new ArrayList<String>();
+		private List<Class<? extends Event>> newEvents = new ArrayList<Class<? extends Event>>();
 		
 		public InitializationEvent(Object sender) {
 			super(sender);
@@ -45,6 +46,14 @@ public abstract class PluginManagerEvent extends Event {
 			if(upperVersion == null) upperVersion = "any";
 			
 			dependencies.add(id + "@" + lowerVersion + ":" + upperVersion);
+		}
+		
+		public void addEvent(Class<? extends Event> event) {
+			this.newEvents.add(event);
+		}
+
+		public List<Class<? extends Event>> getEvents() {
+			return this.newEvents;
 		}
 	}
 	

@@ -3,6 +3,12 @@ package pluginmanager.api.event;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+/**
+ * Extend this class at runtime
+ * 
+ * @author alexander
+ *
+ */
 public abstract class Event {
 	private final Object SENDER;
 	private final ArrayList<Method> handledBy = new ArrayList<Method>();
