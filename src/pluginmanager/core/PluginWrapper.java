@@ -6,22 +6,29 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PluginWrapper {
+	
+	private final String pluginID;
+	private final String pluginVersion;
+	private final String pluginName;
 	private final Class<?> pluginClass;
 	private final ArrayList<Class<?>> eventHandlerSubscribers;
 	private final HashMap<String, ArrayList<Class<?>>> customAnnotated;
 	private final Object pluginInstance;
 	
 	public PluginWrapper(Class<?> pluginClass, ArrayList<Class<?>> subscribers, HashMap<String, ArrayList<Class<?>>>
-	withCustomAnnotation) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
+	withCustomAnnotation, String id, String version, String name) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 	
 		this.pluginClass = pluginClass;
 		this.eventHandlerSubscribers = subscribers;
 		this.customAnnotated = withCustomAnnotation;
 		this.pluginInstance = this.getNewPluginInstance();
+		this.pluginID = id;
+		this.pluginVersion = version;
+		this.pluginName = name;
 	}
 	
 	/**
-	 * Creates a new Instance of this plugin. Internal usse only!
+	 * Creates a new Instance of this plugin. Internal use only!
 	 * 
 	 * @return
 	 * @throws InvocationTargetException 
@@ -64,6 +71,18 @@ public class PluginWrapper {
 	
 	public Object getInstance() {
 		return this.pluginInstance;
+	}
+	
+	public String getID() {
+		return this.pluginID;
+	}
+	
+	public String getVersion() {
+		return this.pluginVersion;
+	}
+	
+	public String getName() {
+		return this.pluginName;
 	}
 	
 	/**

@@ -5,7 +5,7 @@ import java.net.MalformedURLException;
 
 import pluginmanager.api.exceptions.StoredException;
 import pluginmanager.core.PluginManager;
-import pluginmanager.discoverer.JarDiscoverer;
+import pluginmanager.loading.JarDiscoverer;
 import pluginmanager.util.ConsoleHandler;
 
 public class Test {

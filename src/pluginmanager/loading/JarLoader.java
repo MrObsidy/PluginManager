@@ -6,7 +6,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 
-import pluginmanager.discoverer.JarDiscoverer;
 import pluginmanager.util.ConsoleHandler;
 
 public class JarLoader {

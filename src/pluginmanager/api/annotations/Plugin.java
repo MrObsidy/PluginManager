@@ -16,4 +16,11 @@ import java.lang.annotation.Documented;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Plugin {
+	String name();
+	
+	String id();
+	
+	String version();
+	
+	boolean canBeLoadedAtRuntime() default false;
 }
